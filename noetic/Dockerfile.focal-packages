@@ -1,0 +1,23 @@
+FROM rosnoetic-focal:minimal
+
+RUN apt-get update
+RUN apt-get -y install python3-rosdep
+RUN apt-get -y install python3-rosinstall-generator
+RUN apt-get -y install python3-wstool
+RUN apt-get -y install python3-rosinstall
+
+WORKDIR /home/root/ros_catkin_ws
+
+COPY generator.sh ./
+
+RUN ["/bin/bash", "-c", "source /opt/ros/noetic/setup.bash && ./generator.sh"]
+
+WORKDIR /home/root
+
+RUN rm -fR ros_catkin_ws
+
+RUN bash /opt/ros/noetic/lib/mavros/install_geographiclib_datasets.sh
+
+RUN echo 'export PS1="rosnoetic:\W\\$ "' >> /root/.bashrc
+
+CMD /bin/bash
