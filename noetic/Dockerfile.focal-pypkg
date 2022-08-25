@@ -1,0 +1,23 @@
+FROM rosnoetic-focal:barebones
+
+# Install Python3 packages.
+RUN apt-get -y install python3
+RUN apt-get -y install python3-dev
+RUN apt-get -y install python3-pip
+RUN apt-get -y install python3-rospy
+RUN apt-get -y install python3-rosdep
+RUN apt-get -y install python3-rospkg
+RUN apt-get -y install python3-rosinstall-generator
+RUN apt-get -y install python3-rosinstall
+RUN apt-get -y install python3-wstool
+RUN apt-get -y install python3-vcstools
+RUN apt-get -y install python3-catkin-tools
+RUN apt-get -y install python3-catkin-pkg
+
+RUN python3 -m pip install pyyaml==5.4.1
+RUN python3 -m pip install defusedxml
+
+RUN rosdep init
+RUN rosdep update
+
+CMD /bin/bash

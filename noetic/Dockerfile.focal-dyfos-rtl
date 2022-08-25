@@ -1,0 +1,52 @@
+FROM rosnoetic-focal:pypkg
+
+RUN apt-get update
+
+# Install the build command.
+RUN python3 -m pip install build
+RUN apt-get install -y python3.8-venv
+
+# Set up MAVROS PX4 vehicle.
+WORKDIR /opt
+RUN git clone https://github.com/troiwill/mavros-px4-vehicle.git
+
+# Install the Python module.
+WORKDIR /opt/mavros-px4-vehicle
+RUN python3 -m build
+RUN python3 -m pip install dist/*.whl
+
+# Make the Python scripts executable.
+RUN chmod +x scripts/*.py
+RUN chmod +x test/*.py
+RUN echo "" >> /root/.bashrc
+RUN echo "# mavros px4 vehicle paths." >> /root/.bashrc
+RUN echo "export PATH=${PATH}:/opt/mavros-px4-vehicle/scripts" >> /root/.bashrc
+RUN echo "export PATH=${PATH}:/opt/mavros-px4-vehicle/test" >> /root/.bashrc
+
+# Set up Sensing Aruco.
+WORKDIR /opt
+RUN git clone https://github.com/troiwill/sensing-aruco.git
+
+# Install the Python module.
+WORKDIR /opt/sensing-aruco/sense_aruco
+RUN python3 -m pip uninstall opencv-python opencv-contrib-python
+RUN python3 -m build
+RUN python3 -m pip install dist/*.whl
+
+# Make the Python scripts executable.
+RUN chmod +x scripts/*.py
+RUN echo "" >> /root/.bashrc
+RUN echo "# sense aruco paths." >> /root/.bashrc
+RUN echo "export PATH=${PATH}:/opt/sensing-aruco/sense_aruco/scripts" >> /root/.bashrc
+
+# Copy the setup files that need to be sourced.
+RUN mkdir -p /opt/bash_scripts
+COPY setup_ros.sh /opt/bash_scripts/
+COPY setup_px4.sh /opt/bash_scripts/
+COPY launch_px4_mavros.sh /opt/bash_scripts/
+RUN chmod +x /opt/bash_scripts/*.sh
+RUN echo "" >> /root/.bashrc
+RUN echo "# setup files for mavros, px4, and ros." >> /root/.bashrc
+RUN echo "export PATH=${PATH}:/opt/bash_scripts" >> /root/.bashrc
+
+CMD /bin/bash

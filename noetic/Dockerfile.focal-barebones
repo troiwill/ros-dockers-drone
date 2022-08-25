@@ -1,0 +1,70 @@
+FROM arm64v8-focal
+
+RUN apt-get update
+RUN apt-get install -y apt-transport-https
+RUN apt-get install -y software-properties-common
+RUN apt-get install -y wget
+RUN apt-get -y upgrade
+
+# Allow "restricted", "universe", and "multiverse."
+RUN add-apt-repository universe
+RUN add-apt-repository restricted
+RUN add-apt-repository multiverse
+
+# Setup the sources.list.
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu focal main" > /etc/apt/sources.list.d/ros-latest.list'
+
+# Setup the keys.
+RUN apt-get -y install curl
+RUN apt-get -y install gnupg
+RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | apt-key add -
+
+# Install editors.
+RUN apt-get update
+RUN apt-get -y install vim
+RUN apt-get -y install sudo
+RUN apt-get -y install nano
+
+# Install some additional prerequisties.
+RUN apt-get -y install build-essential
+RUN apt-get -y install libboost-all-dev
+RUN apt-get -y install libconsole-bridge-dev
+RUN apt-get -y install libtinyxml-dev
+RUN apt-get -y install sbcl-source
+RUN apt-get -y install sbcl-doc
+
+# Perform the installation.
+RUN apt-get -y install ros-noetic-ros-base
+
+# Install additional packages.
+RUN apt-get -y install ros-noetic-class-loader
+RUN apt-get -y install ros-noetic-diagnostic-msgs
+RUN apt-get -y install ros-noetic-geographic-msgs
+RUN apt-get -y install ros-noetic-geometry2
+RUN apt-get -y install ros-noetic-libmavconn
+RUN apt-get -y install ros-noetic-map-msgs
+RUN apt-get -y install ros-noetic-mavlink
+RUN apt-get -y install ros-noetic-mavros
+RUN apt-get -y install ros-noetic-mavros-extras
+RUN apt-get -y install ros-noetic-mavros-msgs
+RUN apt-get -y install ros-noetic-nav-msgs
+RUN apt-get -y install ros-noetic-nodelet
+RUN apt-get -y install ros-noetic-nodelet-topic-tools
+RUN apt-get -y install ros-noetic-pcl-msgs
+RUN apt-get -y install ros-noetic-rosbag-migration-rule
+RUN apt-get -y install ros-noetic-rosconsole-bridge
+RUN apt-get -y install ros-noetic-serial
+RUN apt-get -y install ros-noetic-shape-msgs
+RUN apt-get -y install ros-noetic-stereo-msgs
+RUN apt-get -y install ros-noetic-tf
+RUN apt-get -y install ros-noetic-trajectory-msgs
+RUN apt-get -y install ros-noetic-uuid-msgs
+RUN apt-get -y install ros-noetic-visualization-msgs
+
+RUN bash /opt/ros/noetic/lib/mavros/install_geographiclib_datasets.sh
+
+# Environment setup
+RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc
+RUN echo 'export PS1="rosnoetic:\W\\$ "' >> /root/.bashrc
+
+CMD /bin/bash
